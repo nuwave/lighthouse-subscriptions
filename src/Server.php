@@ -46,7 +46,7 @@ class Server
         $this->runKeepAlive();
 
         $loop->addPeriodicTimer(10, function () {
-            \Nuwave\Lighthouse\Subscriptions\TransportManager::getInstance()->log();
+            \Nuwave\Lighthouse\Subscriptions\WebSocket\TransportManager::getInstance()->log();
         });
 
         $loop->run();
