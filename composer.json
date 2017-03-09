@@ -1,0 +1,27 @@
+{
+    "name": "nuwave/lighthouse-subscriptions",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christopher Moore",
+            "email": "chris@nuwavecommerce.com"
+        }
+    ],
+    "require": {
+        "nuwave/lighthouse": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nuwave\\Lighthouse\\Subscriptions\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nuwave\\Lighthouse\\Subscriptions\\Tests\\": "tests/"
+        }
+    }
+}
