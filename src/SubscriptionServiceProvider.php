@@ -16,7 +16,7 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/config.php' => config_path('lighthouse-subscriptions.php')
         ]);
-        
+
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'lighthouse-subscriptions');
     }
 
@@ -33,5 +33,9 @@ class SubscriptionServiceProvider extends ServiceProvider
                 config('lighthouse-subscriptions.keep_alive')
             );
         });
+
+        $this->commands([
+            Support\Console\Commands\WebSocketServerCommand::class,
+        ]);
     }
 }

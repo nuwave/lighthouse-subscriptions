@@ -61,7 +61,7 @@ class Server
     protected function runServer($loop)
     {
         $parser = new Parser();
-        $pusher = new \Nuwave\Lighthouse\Subscriptions\Pusher($loop);
+        $pusher = new \Nuwave\Lighthouse\Subscriptions\WebSocket\Pusher($loop);
         $webSock = new \React\Socket\Server($loop);
 
         $webSock->listen($this->port);
@@ -69,7 +69,7 @@ class Server
         return new \Ratchet\Server\IoServer(
             new \Ratchet\Http\HttpServer(
                 new \Ratchet\WebSocket\WsServer(
-                    new \Nuwave\Lighthouse\Subscriptions\TransportManager($pusher)
+                    new \Nuwave\Lighthouse\Subscriptions\WebSocket\TransportManager($pusher)
                 )
             ),
             $webSock
