@@ -67,7 +67,7 @@ class SubscriptionManager
     public function subscribe(ConnectionInterface $conn, $subId, array $params)
     {
         if ($subscriber = $this->find($conn)) {
-            $subscriber->subscribe($subId, $params);
+            $subscriber->subscribe($subId, $params, $conn->WebSocket->request);
 
             return true;
         }

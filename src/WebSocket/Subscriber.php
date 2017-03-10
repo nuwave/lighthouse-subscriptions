@@ -23,13 +23,6 @@ class Subscriber
     private $auth;
 
     /**
-     * Connection context.
-     *
-     * @var mixed
-     */
-    private $context;
-
-    /**
      * Subsribed queries.
      *
      * @var \Illuminate\Support\Collection
@@ -37,14 +30,23 @@ class Subscriber
     private $subscriptions;
 
     /**
+     * Connection context.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    private $context;
+
+    /**
      * Create new instance of subscriber.
      *
+     * @param  ConnectionInterface $conn
      * @return void
      */
     public function __construct(ConnectionInterface $conn)
     {
         $this->conn = $conn;
         $this->subscriptions = collect([]);
+        $this->context = collect([]);
     }
 
     /**
@@ -62,9 +64,10 @@ class Subscriber
      *
      * @param  integer $subId
      * @param  array  $params
+     * @param  mixed  $request
      * @return void
      */
-    public function subscribe($subId, array $params)
+    public function subscribe($subId, array $params, $request)
     {
         if ($this->subscriptions->has($subId)) {
             $this->subscriptions->forget($subId);
@@ -72,12 +75,14 @@ class Subscriber
 
         $query = array_get($params, 'query', '');
         $args = array_get($params, 'variables', []);
-        $context = $this->getContext($query, $args);
+
+        $this->validateSubscription($query, $args, $request);
+
         $triggerName = Parser::getInstance()->subscriptionName($query);
 
         $this->subscriptions->put(
             $subId,
-            compact('context', 'args', 'query', 'triggerName')
+            compact('args', 'query', 'triggerName')
         );
     }
 
@@ -105,13 +110,15 @@ class Subscriber
 
         $this->subscriptions->filter(function ($subscription) use ($triggerName) {
             return $subscription['triggerName'] === $triggerName;
+        })->filter(function ($subscription) {
+            return $this->filterQuery($subscription);
         })->each(function ($subscription, $subId) use ($conn) {
             $conn->send(json_encode([
                 'type' => 'subscription_data',
                 'id' => $subId,
                 'payload' => app('graphql')->execute(
                     $subscription['query'],
-                    $subscription['context'],
+                    $this->context,
                     $subscription['args']
                 )
             ]));
@@ -119,20 +126,31 @@ class Subscriber
     }
 
     /**
-     * Get context for subscription.
+     * Store auth for connection.
+     *
+     * @param  mixed $auth
+     * @return void
+     */
+    public function authorize($auth)
+    {
+        $this->auth = $auth;
+    }
+
+    /**
+     * Handle new subscription request.
      *
      * @param  string $query
      * @param  array  $variables
+     * @param  mixed  $request
      * @return mixed
      */
-    protected function getContext($query, array $variables)
+    protected function validateSubscription($query, array $variables, $request)
     {
         Parser::getInstance()->validate($query);
 
         $query = Parser::getInstance()->getSubscription($query);
-        $context = $query->onSubscribe($variables);
 
-        if (!(bool) $context) {
+        if (!$query->canSubscribe($variables, $request, $this->context)) {
             $subscription = Parser::getInstance()->subscriptionName($query);
 
             $exception = new UnprocessableSubscription("Unable to subscribe");
@@ -140,7 +158,23 @@ class Subscriber
 
             throw new $exception;
         }
+    }
 
-        return $context;
+    /**
+     * Get context for for query.
+     *
+     * @param  array  $subscription
+     * @return mixed
+     */
+    protected function filterQuery(array $subscription)
+    {
+        $query = Parser::getInstance()->getSubscription(
+            array_get($subscription, 'query', '')
+        );
+
+        return $query->filter(
+            array_get($subscription, 'args', []),
+            $this->context
+        );
     }
 }
