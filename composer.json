@@ -13,7 +13,9 @@
         "illuminate/support": "^5.4",
         "illuminate/redis": "^5.4",
         "illuminate/broadcasting": "^5.4",
-        "illuminate/console": "^5.4"
+        "illuminate/console": "^5.4",
+        "cboden/ratchet": "^0.3.6",
+        "predis/predis-async": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0",
