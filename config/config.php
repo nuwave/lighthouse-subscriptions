@@ -11,4 +11,9 @@ return [
      * if your connection requires it.
      */
     'keep_alive' => env('WEBSOCKET_KEEPALIVE', null),
+
+    /**
+     * Namespace for generated GraphQL Subscriptions.
+     */
+    'namespace'   => 'App\\Http\\GraphQL\\Subscriptions',
 ];

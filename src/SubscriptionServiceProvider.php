@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Broadcasting\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\Support\Broadcasters\RedisBroadcaster;
 
 class SubscriptionServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,8 @@ class SubscriptionServiceProvider extends ServiceProvider
         ]);
 
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'lighthouse-subscriptions');
+
+        $this->regsiterBroadcaster();
     }
 
     /**
@@ -35,7 +39,18 @@ class SubscriptionServiceProvider extends ServiceProvider
         });
 
         $this->commands([
+            Support\Console\Commands\SubscriptionMakeCommand::class,
             Support\Console\Commands\WebSocketServerCommand::class,
         ]);
+    }
+
+    protected function regsiterBroadcaster()
+    {
+        $this->app->make(BroadcastManager::class)->extend('lighthouse', function ($app, $config) {
+            $redis = $app->make('redis');
+            $connection = array_get($config, 'connection');
+
+            return new RedisBroadcaster($redis, $connection);
+        });
     }
 }

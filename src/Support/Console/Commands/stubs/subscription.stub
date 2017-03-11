@@ -1,0 +1,68 @@
+<?php
+
+namespace DummyNamespace;
+
+use GraphQL;
+use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Support\Definition\GraphQLSubscription;
+
+class DummyClass extends GraphQLSubscription
+{
+    /**
+     * Type query returns.
+     *
+     * @return Type
+     */
+    public function type()
+    {
+        // return GraphQL::type('type');
+    }
+
+    /**
+     * Available query arguments.
+     *
+     * @return array
+     */
+    public function args()
+    {
+        return [];
+    }
+
+    /**
+     * Authorize subscription.
+     *
+     * @param  array $args
+     * @param  mixed $request
+     * @param  \Illuminate\Support\Collection $context
+     * @return boolean
+     */
+    public function canSubscribe(array $args, $request, $context)
+    {
+        return false;
+    }
+
+    /**
+     * Filter subscription.
+     *
+     * @param  array  $args
+     * @param  \Illuminate\Support\Collection $context
+     * @return boolean
+     */
+    public function filter(array $args, $context)
+    {
+        return false;
+    }
+
+    /**
+     * Resolve the query.
+     *
+     * @param  mixed  $root
+     * @param  array  $args
+     * @param  \Illuminate\Support\Collection $context
+     * @return mixed
+     */
+    public function resolve($root, array $args, $context)
+    {
+        // TODO: Resolve query
+    }
+}

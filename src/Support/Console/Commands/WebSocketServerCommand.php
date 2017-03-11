@@ -11,7 +11,7 @@ class WebSocketServerCommand extends Command
      *
      * @var string
      */
-    protected $name = 'lighthouse:subscriptions';
+    protected $name = 'lighthouse:subscription-server';
 
     /**
      * The console command description.
